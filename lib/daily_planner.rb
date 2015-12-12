@@ -11,9 +11,10 @@ class DailyPlanner
   
   attr_reader :to_s
 
-  def initialize(filename='daily-planner.txt', path: '.')
+  def initialize(filename='daily-planner.txt', path: '.', 
+                                                   now: DateTime.now.to_date)
     
-    @filename, @path = filename, path
+    @filename, @path, @now = filename, path, now
     
     fpath = File.join(path, filename)
     
@@ -24,7 +25,7 @@ class DailyPlanner
       archive()
       
       # if the date isn't today then update it to today
-      refresh() if @d != DateTime.now.to_date
+      refresh() if @d != @now
 
     else      
       @rx = new_rx
@@ -106,18 +107,22 @@ class DailyPlanner
   def new_rx(today: '', tomorrow: '')
     
     title = "Daily Planner"
-    date = DateTime.now
-    rx = RecordX.new({title: title, date: date, \
+    rx = RecordX.new({title: title, date: @now, \
                                              today: today, tomorrow: tomorrow})    
     return rx
   end
 
   def refresh()
-
-    if @d == DateTime.now.to_date - 1 and @rx.tomorrow.strip.length  > 0 then
-      @rx = new_rx(today: @rx.tomorrow)
-    end
     
+    if @d != @now then
+      
+      @rx = if @d == @now - 1 and @rx.tomorrow.strip.length  > 0 then
+        new_rx(today: @rx.tomorrow)      
+      else
+        new_rx()
+      end
+      
+    end
   end
 
 end
