@@ -18,7 +18,14 @@ class DailyPlanner
     fpath = File.join(path, filename)
     
     if File.exists?(fpath) then
+      
       @rx = import_to_rx(File.read(fpath))
+      @d = Date.parse(@rx.date)
+      archive()
+      
+      # if the date isn't today then update it to today
+      refresh() if @d != DateTime.now.to_date
+
     else      
       @rx = new_rx
     end
@@ -42,7 +49,19 @@ class DailyPlanner
 
   private
   
-  
+  def archive()
+    
+    # archive the daily planner
+    # e.g. dailyplanner/2015/d121215.xml
+        
+    archive_path = File.join(@path, @d.year.to_s)
+    FileUtils.mkdir_p archive_path    
+    filename = @d.strftime("d%d%m%Y.xml")
+    
+    File.write File.join(archive_path, filename), rx.to_xml
+    
+  end
+    
   def import_to_rx(s)
     
     rx = new_rx()
@@ -84,16 +103,21 @@ class DailyPlanner
 
   end
   
-  def new_rx()
+  def new_rx(today: '', tomorrow: '')
     
     title = "Daily Planner"
     date = DateTime.now
-    rx = RecordX.new({title: title, date: date, today: '', tomorrow: ''})
-    
+    rx = RecordX.new({title: title, date: date, \
+                                             today: today, tomorrow: tomorrow})    
     return rx
   end
 
-  def refresh(rxfilepath, latest_rx)
+  def refresh()
+
+    if @d == DateTime.now.to_date - 1 and @rx.tomorrow.strip.length  > 0 then
+      @rx = new_rx(today: @rx.tomorrow)
+    end
+    
   end
 
 end
