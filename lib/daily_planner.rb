@@ -3,7 +3,7 @@
 # file: daily_planner.rb
 
 require 'date'
-require 'recordx'
+require 'dynarex'
 require 'fileutils'
 
 
@@ -12,7 +12,7 @@ class DailyPlanner
   attr_reader :to_s
 
   def initialize(filename='daily-planner.txt', path: '.', 
-                                                   now: DateTime.now.to_date)
+                                         now: DateTime.now.to_date, config: {})
     
     @filename, @path, @now = filename, path, now
     
@@ -29,6 +29,18 @@ class DailyPlanner
 
     else      
       @rx = new_rx
+    end
+    
+    # check for weekly-planner entries which 
+    #   should be added to the daily-planner
+    weeklyplanner_filepath = config[:weeklyplanner_filepath]
+    
+    if weeklyplanner_filepath then
+      
+      dx = Dynarex.new weeklyplanner_filepath
+      record = dx.find_by_id (now+1).strftime("%Y%m%d")      
+      @rx.tomorrow << "\n" + record.x.lines[2..-1].join if record
+
     end
     
   end
