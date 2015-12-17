@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name = 'daily_planner'
-  s.version = '0.2.0'
+  s.version = '0.2.1'
   s.summary = 'Creates a daily-planner.txt template file'
   s.authors = ['James Robertson']
   s.files = Dir['lib/daily_planner.rb']

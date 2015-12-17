@@ -36,10 +36,12 @@ class DailyPlanner
     weeklyplanner_filepath = config[:weeklyplanner_filepath]
     
     if weeklyplanner_filepath then
-      
+
       dx = Dynarex.new weeklyplanner_filepath
       record = dx.find_by_id (now+1).strftime("%Y%m%d")      
-      @rx.tomorrow << "\n" + record.x.lines[2..-1].join if record
+
+      items = record.x.lines[2..-1]
+      @rx.tomorrow << "\n" + items.join if record and items
 
     end
     
